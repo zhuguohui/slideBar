@@ -1,19 +1,28 @@
 package com.android.androidsidebar;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager2.widget.ViewPager2;
+
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 
@@ -32,6 +41,7 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 public class Style5Activity extends AppCompatActivity {
     private final String TAG = "Style5Activity";
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +90,10 @@ public class Style5Activity extends AppCompatActivity {
             }
         });
 
+
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        //支持全屏侧滑
+       DrawerLayoutHelperV2.setDrawerLeftEdgeFullScreen(this,drawerLayout);
         //设置背景蒙层颜色
         drawerLayout.setScrimColor(Color.TRANSPARENT);
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -97,7 +111,7 @@ public class Style5Activity extends AppCompatActivity {
                 //主页面移动
                 ViewHelper.setTranslationX(mContent, width * slideOffset);
 
-                Log.d(TAG, "mMenu width:" + mMenu.getMeasuredWidth() + " : " + "window width" + width);
+               // Log.d(TAG, "mMenu width:" + mMenu.getMeasuredWidth() + " : " + "window width" + width);
             }
 
             @Override
@@ -109,7 +123,51 @@ public class Style5Activity extends AppCompatActivity {
             public void onDrawerClosed(@NonNull View drawerView) {
 
             }
+
+
         });
 
+        setUpViewPager();
+
+        DrawerFrameLayout frameLayout = findViewById(R.id.content_frame);
+        frameLayout.setDrawerLayout(drawerLayout);
+
+    }
+
+    private void setUpViewPager() {
+        ViewPager2 viewPager= findViewById(R.id.viewPager);
+        viewPager.setAdapter(new RecyclerView.Adapter<ViewHolder>() {
+            @NonNull
+            @Override
+            public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                TextView textView=new TextView(parent.getContext());
+                textView.setTextSize(30);
+                textView.setGravity(Gravity.CENTER);
+                RecyclerView.LayoutParams params=new RecyclerView.LayoutParams(-1,-1);
+                textView.setLayoutParams(params);
+                return new ViewHolder(textView);
+            }
+
+            @Override
+            public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+                holder.title.setText("position "+position);
+            }
+
+            @Override
+            public int getItemCount() {
+                return 5;
+            }
+
+        });
+
+
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder{
+        TextView title;
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            this.title= (TextView) itemView;
+        }
     }
 }
