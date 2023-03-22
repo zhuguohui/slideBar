@@ -119,15 +119,10 @@ public class DrawerFrameLayout extends FrameLayout {
                 callDown = true;
             }
 
-            float mX=Math.abs(event.getRawX()-lastX);
-            float mY=Math.abs(event.getRawY()-lastY);
-            boolean isMove = event.getAction() == MotionEvent.ACTION_MOVE;
-            if(mX<5&&mY<5&&isMove){
-                return true;
-            }
 
+            MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(),event.getAction(), event.getRawX(), event.getRawY(), event.getMetaState());
 
-            drawerLayout.onTouchEvent(event);
+            drawerLayout.onTouchEvent(obtain);
             lastX=event.getRawX();
             lastY=event.getRawY();
             return true;
