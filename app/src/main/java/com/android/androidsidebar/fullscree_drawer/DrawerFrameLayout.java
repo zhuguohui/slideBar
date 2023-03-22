@@ -2,6 +2,8 @@ package com.android.androidsidebar.fullscree_drawer;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -44,15 +46,20 @@ public class DrawerFrameLayout extends FrameLayout {
 
             @Override
             public void onDrawerClosed(@NonNull View drawerView) {
-                //设置为这个状态LOCK_MODE_LOCKED_CLOSED
-                //避免drawerLayout拦截childView 的事件
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+
 
             }
 
             @Override
             public void onDrawerStateChanged(int newState) {
-
+                //侧边栏状态
+                boolean isClose = !drawerLayout.isDrawerOpen(Gravity.LEFT);
+                if(newState==0&&isClose){
+                    //设置为这个状态LOCK_MODE_LOCKED_CLOSED
+                    //避免drawerLayout拦截childView 的事件
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                }
             }
         });
 
@@ -96,14 +103,33 @@ public class DrawerFrameLayout extends FrameLayout {
             callDown = false;
         }
 
+        float lastX = 0;
+        float lastY = 0;
+
+
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+
+
             if (!callDown) {
-                MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN, event.getX(), event.getY(), event.getMetaState());
+                MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN, event.getRawX(), event.getRawY(), event.getMetaState());
                 drawerLayout.onTouchEvent(obtain);
+                lastX=event.getRawX();
+                lastY=event.getRawY();
                 callDown = true;
             }
+
+            float mX=Math.abs(event.getRawX()-lastX);
+            float mY=Math.abs(event.getRawY()-lastY);
+            boolean isMove = event.getAction() == MotionEvent.ACTION_MOVE;
+            if(mX<5&&mY<5&&isMove){
+                return true;
+            }
+
+
             drawerLayout.onTouchEvent(event);
+            lastX=event.getRawX();
+            lastY=event.getRawY();
             return true;
         }
     }

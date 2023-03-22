@@ -3,6 +3,8 @@ package com.android.androidsidebar.fullscree_drawer;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -27,6 +29,13 @@ public class FullScreenDrawerLayout extends DrawerLayout {
         super(context,null);
     }
 
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        return super.onTouchEvent(ev);
+    }
+
+
     public FullScreenDrawerLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         screenWidth = getResources().getDisplayMetrics().widthPixels;
@@ -38,7 +47,7 @@ public class FullScreenDrawerLayout extends DrawerLayout {
         addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerStateChanged(int newState) {
-                //侧边栏状态
+
             }
 
             @Override
