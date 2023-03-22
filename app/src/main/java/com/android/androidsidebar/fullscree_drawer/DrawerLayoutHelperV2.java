@@ -1,6 +1,7 @@
-package com.android.androidsidebar;
+package com.android.androidsidebar.fullscree_drawer;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Point;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.customview.widget.ViewDragHelper;
@@ -38,10 +39,10 @@ public class DrawerLayoutHelperV2 {
      * @param drawerLayout
      * @param displayWidthPercentage
      */
-    public  static  void setDrawerLeftEdgeSize(@Nullable Activity activity, @Nullable DrawerLayout drawerLayout, float displayWidthPercentage) {
+    public   static  void setDrawerLeftEdgeSize(@Nullable Context activity, @Nullable DrawerLayout drawerLayout, float displayWidthPercentage) {
         if (activity != null && drawerLayout != null) {
             try {
-                Field leftDraggerField = drawerLayout.getClass().getDeclaredField("mLeftDragger");
+                Field leftDraggerField = DrawerLayout.class.getDeclaredField("mLeftDragger");
                 Intrinsics.checkNotNullExpressionValue(leftDraggerField, "leftDraggerField");
                 leftDraggerField.setAccessible(true);
                 Object var10000 = leftDraggerField.get(drawerLayout);
@@ -53,11 +54,10 @@ public class DrawerLayoutHelperV2 {
                 Field edgeSizeField = leftDragger.getClass().getDeclaredField("mEdgeSize");
                 edgeSizeField.setAccessible(true);
                 int edgeSize = edgeSizeField.getInt(leftDragger);
-                Point displaySize = new Point();
-                WindowManager var14 = activity.getWindowManager();
-                var14.getDefaultDisplay().getSize(displaySize);
-                edgeSizeField.setInt(leftDragger, Math.max(edgeSize, (int)((float)displaySize.x * displayWidthPercentage)));
-                Field leftCallbackField = drawerLayout.getClass().getDeclaredField("mLeftCallback");
+
+                int widthPixels = activity.getResources().getDisplayMetrics().widthPixels;
+                edgeSizeField.setInt(leftDragger,widthPixels);
+                Field leftCallbackField = DrawerLayout.class.getDeclaredField("mLeftCallback");
                 leftCallbackField.setAccessible(true);
                 var10000 = leftCallbackField.get(drawerLayout);
                 if (var10000 == null) {
@@ -78,7 +78,7 @@ public class DrawerLayoutHelperV2 {
         }
     }
 
-    public static void setDrawerLeftEdgeFullScreen(@Nullable Activity activity, @Nullable DrawerLayout drawerLayout) {
+   public   static void setDrawerLeftEdgeFullScreen(@Nullable Context activity, @Nullable DrawerLayout drawerLayout) {
         setDrawerLeftEdgeSize(activity, drawerLayout, 1.0F);
     }
 

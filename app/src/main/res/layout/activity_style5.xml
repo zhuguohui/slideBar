@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout
+<com.android.androidsidebar.fullscree_drawer.FullScreenDrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <!--主页内容-->
-    <com.android.androidsidebar.DrawerFrameLayout
+    <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="375dp"
         android:layout_height="match_parent">
 
         <include layout="@layout/activity_content5"/>
-    </com.android.androidsidebar.DrawerFrameLayout>
+    </FrameLayout>
 
     <!--侧边栏内容-->
     <FrameLayout
         android:id="@+id/menu_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#fff"
         android:layout_gravity="start">
 
         <include layout="@layout/left_menu5"/>
     </FrameLayout>
 
-</androidx.drawerlayout.widget.DrawerLayout>
+</com.android.androidsidebar.fullscree_drawer.FullScreenDrawerLayout>

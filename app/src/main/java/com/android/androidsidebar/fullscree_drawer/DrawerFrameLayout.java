@@ -1,16 +1,13 @@
-package com.android.androidsidebar;
+package com.android.androidsidebar.fullscree_drawer;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 /**
@@ -23,15 +20,15 @@ import androidx.drawerlayout.widget.DrawerLayout;
  */
 public class DrawerFrameLayout extends FrameLayout {
     DrawerLayout drawerLayout;
+
     public DrawerFrameLayout(@NonNull Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public DrawerFrameLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void setDrawerLayout(DrawerLayout drawerLayout) {
         this.drawerLayout = drawerLayout;
         this.drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -58,48 +55,58 @@ public class DrawerFrameLayout extends FrameLayout {
 
             }
         });
-        setNestedScrollingEnabled(true);
+
     }
 
     @Override
     public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
         target.setOnTouchListener(null);
-        setTouchListener=false;
-        return nestedScrollAxes==1;
+        setTouchListener = false;
+        return nestedScrollAxes == 1;
 
     }
 
     View target;
-    boolean setTouchListener=false;
+    boolean setTouchListener = false;
 
     @Override
     public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
         super.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
-       // Log.d("zzz", "onNestedScroll() called with:  dxConsumed = [" + dxConsumed + "], dyConsumed = [" + dyConsumed + "], dxUnconsumed = [" + dxUnconsumed + "], dyUnconsumed = [" + dyUnconsumed + "]");
         //内部滑动结束调用
-        if(dxUnconsumed<0&&!setTouchListener){
+        if (dxUnconsumed < 0 && !setTouchListener) {
             //表示已经滑到左边边界了
-            if(drawerLayout!=null){
+            if (drawerLayout != null) {
                 //开始拦截事件
                 drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED);
-                this.target=target;
-                target.setOnTouchListener(new MyTouchListener());
-                setTouchListener=true;
+                this.target = target;
+                myTouchListener.reset();
+                target.setOnTouchListener(myTouchListener);
+                setTouchListener = true;
             }
 
         }
     }
-  class  MyTouchListener  implements OnTouchListener {
-        boolean callDown=false;
+
+    MyTouchListener myTouchListener = new MyTouchListener();
+
+    class MyTouchListener implements OnTouchListener {
+        boolean callDown = false;
+
+        void reset() {
+            callDown = false;
+        }
+
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if(!callDown){
+            if (!callDown) {
                 MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN, event.getX(), event.getY(), event.getMetaState());
                 drawerLayout.onTouchEvent(obtain);
-                callDown=true;
+                callDown = true;
             }
             drawerLayout.onTouchEvent(event);
             return true;
         }
-    };
+    }
+
+    ;
 }

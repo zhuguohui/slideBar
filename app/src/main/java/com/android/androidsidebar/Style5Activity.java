@@ -8,15 +8,12 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +21,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.androidsidebar.fullscree_drawer.DrawerFrameLayout;
+import com.android.androidsidebar.fullscree_drawer.DrawerLayoutHelperV2;
+import com.android.androidsidebar.fullscree_drawer.FullScreenDrawerLayout;
 import com.nineoldandroids.view.ViewHelper;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -47,10 +47,10 @@ public class Style5Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //隐藏状态栏时，获取状态栏高度
         int statusBarHeight = ScreenInfoUtils.getStatusBarHeight(this);
-        ScreenInfoUtils.fullScreen(this);
+     //   ScreenInfoUtils.fullScreen(this);
 
         setContentView(R.layout.activity_style5);
-
+/*
         //初始化状态栏的高度
         View statusbar = (View) findViewById(R.id.view_statusbar);
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(MATCH_PARENT, statusBarHeight);
@@ -130,7 +130,11 @@ public class Style5Activity extends AppCompatActivity {
         setUpViewPager();
 
         DrawerFrameLayout frameLayout = findViewById(R.id.content_frame);
-        frameLayout.setDrawerLayout(drawerLayout);
+        frameLayout.setDrawerLayout(drawerLayout);*/
+
+        setUpViewPager();
+        FullScreenDrawerLayout drawerLayout=findViewById(R.id.drawer_layout);
+      //  drawerLayout.openDrawer(Gravity.LEFT);
 
     }
 
