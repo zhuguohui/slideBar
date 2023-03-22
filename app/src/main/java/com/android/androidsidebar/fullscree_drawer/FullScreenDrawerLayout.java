@@ -11,8 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.nineoldandroids.view.ViewHelper;
-
 /**
  * <pre>
  * Created by zhuguohui
@@ -48,7 +46,7 @@ public class FullScreenDrawerLayout extends DrawerLayout {
                 //获取主页内容view
                 View mContent = getChildAt(0);
                 //主页面移动
-                ViewHelper.setTranslationX(mContent, screenWidth * slideOffset);
+                mContent.setTranslationX(screenWidth*slideOffset);
 
             }
 
