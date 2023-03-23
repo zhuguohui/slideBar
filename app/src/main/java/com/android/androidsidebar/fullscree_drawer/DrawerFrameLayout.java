@@ -84,15 +84,19 @@ public class DrawerFrameLayout extends FrameLayout {
     private void closeDrawerLayoutTouch() {
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         target.setOnTouchListener(null);
-        long time = System.currentTimeMillis();
+
         //重置状态
-        target.dispatchTouchEvent(MotionEvent.obtain(time, time, MotionEvent.ACTION_CANCEL, 0, 0, 0));
+        cancelTargetView();
         setTouchListener = false;
     }
 
     View target;
     boolean setTouchListener = false;
 
+    private void cancelTargetView(){
+        long time = System.currentTimeMillis();
+        target.dispatchTouchEvent(MotionEvent.obtain(time, time, MotionEvent.ACTION_CANCEL, 0, 0, 0));
+    }
 
 
     @Override
@@ -104,10 +108,13 @@ public class DrawerFrameLayout extends FrameLayout {
             float velocityX = Math.abs(dxUnconsumed) / useTime;
 
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED);
+            setTouchListener = true;
+            this.target = target;
             if (velocityX > 300) {
                 //快速滑动
                 //直接打开
                 drawerLayout.openDrawer(Gravity.LEFT);
+                cancelTargetView();
 
             } else {
                 //慢慢滑动
@@ -116,8 +123,7 @@ public class DrawerFrameLayout extends FrameLayout {
                 target.setOnTouchListener(myTouchListener);
 
             }
-            setTouchListener = true;
-            this.target = target;
+
         }
     }
 
