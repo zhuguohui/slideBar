@@ -2,7 +2,6 @@ package com.android.androidsidebar.fullscree_drawer;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -58,29 +57,46 @@ public class DrawerFrameLayout extends FrameLayout {
                 if(newState==0&&isClose){
                     //设置为这个状态LOCK_MODE_LOCKED_CLOSED
                     //避免drawerLayout拦截childView 的事件
-                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                    closeDrawerLayoutTouch();
                 }
             }
         });
+    }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+
+        return super.dispatchTouchEvent(ev);
     }
 
     @Override
     public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
-        target.setOnTouchListener(null);
-        setTouchListener = false;
+
         return nestedScrollAxes == 1;
 
+    }
+
+    private void closeDrawerLayoutTouch(){
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        target.setOnTouchListener(null);
+        long time = System.currentTimeMillis();
+        //重置状态
+        target.dispatchTouchEvent(MotionEvent.obtain(time,time,MotionEvent.ACTION_CANCEL,0,0,0));
+        setTouchListener = false;
     }
 
     View target;
     boolean setTouchListener = false;
 
+
+
+
     @Override
     public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
         super.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
+
         //内部滑动结束调用
-        if (dxUnconsumed < 0 && !setTouchListener) {
+        if (dxUnconsumed < -10 && !setTouchListener) {
             //表示已经滑到左边边界了
             if (drawerLayout != null) {
                 //开始拦截事件
@@ -90,7 +106,6 @@ public class DrawerFrameLayout extends FrameLayout {
                 target.setOnTouchListener(myTouchListener);
                 setTouchListener = true;
             }
-
         }
     }
 
@@ -101,7 +116,9 @@ public class DrawerFrameLayout extends FrameLayout {
 
         void reset() {
             callDown = false;
+
         }
+
 
         float lastX = 0;
         float lastY = 0;
@@ -110,18 +127,15 @@ public class DrawerFrameLayout extends FrameLayout {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
 
-
             if (!callDown) {
-                MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN, event.getRawX(), event.getRawY(), event.getMetaState());
-                drawerLayout.onTouchEvent(obtain);
+                MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN, event.getRawX(),event.getRawY(), event.getMetaState());
+                drawerLayout.onInterceptTouchEvent(obtain);
                 lastX=event.getRawX();
                 lastY=event.getRawY();
                 callDown = true;
             }
 
-
-            MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(),event.getAction(), event.getRawX(), event.getRawY(), event.getMetaState());
-
+            MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(),event.getAction(), event.getRawX(),event.getRawY(), event.getMetaState());
             drawerLayout.onTouchEvent(obtain);
             lastX=event.getRawX();
             lastY=event.getRawY();
