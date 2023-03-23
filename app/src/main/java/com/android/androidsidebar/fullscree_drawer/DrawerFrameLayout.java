@@ -96,7 +96,7 @@ public class DrawerFrameLayout extends FrameLayout {
         super.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
 
         //内部滑动结束调用
-        if (dxUnconsumed < -10 && !setTouchListener) {
+        if (dxUnconsumed < 0 && !setTouchListener) {
             //表示已经滑到左边边界了
             if (drawerLayout != null) {
                 //开始拦截事件
