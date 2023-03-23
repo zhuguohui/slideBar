@@ -21,6 +21,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
  */
 public class DrawerFrameLayout extends FrameLayout {
     DrawerLayout drawerLayout;
+    private MotionEvent downEvent;
 
     public DrawerFrameLayout(@NonNull Context context) {
         this(context, null);
@@ -47,14 +48,13 @@ public class DrawerFrameLayout extends FrameLayout {
             public void onDrawerClosed(@NonNull View drawerView) {
 
 
-
             }
 
             @Override
             public void onDrawerStateChanged(int newState) {
                 //侧边栏状态
                 boolean isClose = !drawerLayout.isDrawerOpen(Gravity.LEFT);
-                if(newState==0&&isClose){
+                if (newState == 0 && isClose) {
                     //设置为这个状态LOCK_MODE_LOCKED_CLOSED
                     //避免drawerLayout拦截childView 的事件
                     closeDrawerLayoutTouch();
@@ -63,9 +63,14 @@ public class DrawerFrameLayout extends FrameLayout {
         });
     }
 
+    long downTime = 0;
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            downTime = System.currentTimeMillis();
+            downEvent = MotionEvent.obtain(ev);
+        }
         return super.dispatchTouchEvent(ev);
     }
 
@@ -76,12 +81,12 @@ public class DrawerFrameLayout extends FrameLayout {
 
     }
 
-    private void closeDrawerLayoutTouch(){
+    private void closeDrawerLayoutTouch() {
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         target.setOnTouchListener(null);
         long time = System.currentTimeMillis();
         //重置状态
-        target.dispatchTouchEvent(MotionEvent.obtain(time,time,MotionEvent.ACTION_CANCEL,0,0,0));
+        target.dispatchTouchEvent(MotionEvent.obtain(time, time, MotionEvent.ACTION_CANCEL, 0, 0, 0));
         setTouchListener = false;
     }
 
@@ -90,22 +95,29 @@ public class DrawerFrameLayout extends FrameLayout {
 
 
 
-
     @Override
     public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
         super.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
-
         //内部滑动结束调用
         if (dxUnconsumed < 0 && !setTouchListener) {
-            //表示已经滑到左边边界了
-            if (drawerLayout != null) {
+            float useTime = (System.currentTimeMillis() - downTime) * 1.0f / 1000;
+            float velocityX = Math.abs(dxUnconsumed) / useTime;
+
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED);
+            if (velocityX > 300) {
+                //快速滑动
+                //直接打开
+                drawerLayout.openDrawer(Gravity.LEFT);
+
+            } else {
+                //慢慢滑动
                 //开始拦截事件
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED);
-                this.target = target;
                 myTouchListener.reset();
                 target.setOnTouchListener(myTouchListener);
-                setTouchListener = true;
+
             }
+            setTouchListener = true;
+            this.target = target;
         }
     }
 
@@ -128,17 +140,19 @@ public class DrawerFrameLayout extends FrameLayout {
         public boolean onTouch(View v, MotionEvent event) {
 
             if (!callDown) {
-                MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN, event.getRawX(),event.getRawY(), event.getMetaState());
-                drawerLayout.onInterceptTouchEvent(obtain);
-                lastX=event.getRawX();
-                lastY=event.getRawY();
+                // MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN, event.getRawX(),event.getRawY(), event.getMetaState());
+                drawerLayout.onInterceptTouchEvent(downEvent);
+                lastX = event.getRawX();
+                lastY = event.getRawY();
                 callDown = true;
+                downEvent.recycle();
             }
 
-            MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(),event.getAction(), event.getRawX(),event.getRawY(), event.getMetaState());
+            MotionEvent obtain = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), event.getAction(), event.getRawX(), event.getRawY(), event.getMetaState());
             drawerLayout.onTouchEvent(obtain);
-            lastX=event.getRawX();
-            lastY=event.getRawY();
+            lastX = event.getRawX();
+            lastY = event.getRawY();
+            obtain.recycle();
             return true;
         }
     }
